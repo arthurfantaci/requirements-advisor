@@ -13,14 +13,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy dependency files
+# Copy dependency files and source code (needed for package build)
 COPY pyproject.toml ./
+COPY src/ ./src/
 
 # Create virtual environment and install dependencies
 RUN uv venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Install production dependencies
+# Install the package (includes dependencies)
 RUN uv pip install --no-cache .
 
 # ============================================
@@ -59,9 +60,9 @@ ENV PORT="8000"
 # Expose port
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import httpx; httpx.get('http://localhost:8000/health', timeout=5)" || exit 1
+# Health check - verify server is responding
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD python -c "import httpx; httpx.get('http://localhost:8000/sse', timeout=5)" || exit 1
 
 # Default command: start the MCP server
 CMD ["python", "-m", "requirements_advisor.cli", "serve"]
