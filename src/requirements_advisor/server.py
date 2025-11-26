@@ -42,8 +42,8 @@ def get_vector_store():
 
 # Create MCP server
 mcp = FastMCP(
-    "requirements-advisor",
-    description=(
+    name="requirements-advisor",
+    instructions=(
         "Expert guidance on requirements management best practices. "
         "Provides answers from authoritative sources including Jama Software's "
         "Essential Guide to Requirements Management, INCOSE guidelines, and EARS notation."

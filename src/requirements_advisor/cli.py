@@ -11,7 +11,6 @@ import asyncio
 from pathlib import Path
 
 import typer
-import uvicorn
 from rich.console import Console
 from rich.table import Table
 
@@ -28,25 +27,20 @@ console = Console()
 def serve(
     host: str = typer.Option(settings.host, "--host", "-h", help="Host to bind to"),
     port: int = typer.Option(settings.port, "--port", "-p", help="Port to bind to"),
-    reload: bool = typer.Option(False, "--reload", "-r", help="Enable auto-reload for development"),
 ):
     """Start the MCP server with SSE transport."""
+    from .server import mcp
+
     console.print(f"[bold blue]Starting Requirements Advisor MCP Server[/]")
     console.print(f"Host: {host}:{port}")
     console.print(f"SSE endpoint: http://{host}:{port}/sse")
     console.print()
-    
+
     # Check for API key
     if not settings.voyage_api_key:
         console.print("[red]Warning: VOYAGE_API_KEY not set. Tools will fail.[/]")
-    
-    uvicorn.run(
-        "requirements_advisor.server:create_sse_app",
-        host=host,
-        port=port,
-        reload=reload,
-        factory=True,
-    )
+
+    mcp.run(transport="sse", host=host, port=port)
 
 
 @app.command()
