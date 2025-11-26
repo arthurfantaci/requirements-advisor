@@ -38,11 +38,12 @@ RUN useradd --create-home --shell /bin/bash appuser
 COPY --from=builder /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Copy application source
+# Copy application source and content
 COPY src/ ./src/
+COPY content/ ./content/
 
-# Create directories for data and content
-RUN mkdir -p /app/data/chroma /app/content \
+# Create data directory and set permissions
+RUN mkdir -p /app/data/chroma \
     && chown -R appuser:appuser /app
 
 # Switch to non-root user
