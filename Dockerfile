@@ -60,9 +60,9 @@ ENV PORT="8000"
 # Expose port
 EXPOSE 8000
 
-# Health check - verify server is responding
+# Health check - verify server process is running
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD python -c "import httpx; httpx.get('http://localhost:8000/sse', timeout=5)" || exit 1
+    CMD pgrep -f "requirements_advisor" || exit 1
 
 # Default command: start the MCP server
 CMD ["python", "-m", "requirements_advisor.cli", "serve"]
