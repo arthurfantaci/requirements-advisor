@@ -44,8 +44,7 @@ ENV/
 data/
 !data/.gitkeep
 
-# Content (may contain scraped data)
-content/*.jsonl
+# Content directory (JSONL files are tracked)
 !content/.gitkeep
 
 # Docker
