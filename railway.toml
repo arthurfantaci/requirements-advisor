@@ -1,6 +1,8 @@
 [build]
 builder = "dockerfile"
 dockerfilePath = "Dockerfile"
+# Railway automatically passes environment variables as build args
+# Ensure VOYAGE_API_KEY is set in Railway dashboard under Variables
 
 [deploy]
 restartPolicyType = "on_failure"
