@@ -379,7 +379,16 @@ def create_app():
     return mcp
 
 
-# For SSE transport
+# For Streamable HTTP transport
+def create_http_app():
+    """Create the Streamable HTTP transport app."""
+    return mcp.http_app(path="/mcp")
+
+
+# For SSE transport (deprecated)
 def create_sse_app():
-    """Create the SSE transport app."""
+    """Create the SSE transport app.
+
+    Deprecated: Use create_http_app() instead for Streamable HTTP transport.
+    """
     return mcp.sse_app()

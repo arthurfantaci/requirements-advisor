@@ -17,10 +17,11 @@ Usage:
 
 __version__ = "0.1.0"
 
-from .server import create_app, create_sse_app, mcp
+from .server import create_app, create_http_app, create_sse_app, mcp
 
 __all__ = [
     "mcp",
     "create_app",
+    "create_http_app",
     "create_sse_app",
 ]

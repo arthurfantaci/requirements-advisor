@@ -41,13 +41,13 @@ def serve(
     host: str = typer.Option(settings.host, "--host", "-h", help="Host to bind to"),
     port: int = typer.Option(settings.port, "--port", "-p", help="Port to bind to"),
 ):
-    """Start the MCP server with SSE transport."""
+    """Start the MCP server with Streamable HTTP transport."""
     from .server import mcp
 
     logger.info("Starting MCP server on {}:{}", host, port)
     console.print("[bold blue]Starting Requirements Advisor MCP Server[/]")
     console.print(f"Host: {host}:{port}")
-    console.print(f"SSE endpoint: http://{host}:{port}/sse")
+    console.print(f"MCP endpoint: http://{host}:{port}/mcp")
     console.print()
 
     # Check for API key
@@ -55,7 +55,7 @@ def serve(
         logger.warning("VOYAGE_API_KEY not set - tools will fail")
         console.print("[red]Warning: VOYAGE_API_KEY not set. Tools will fail.[/]")
 
-    mcp.run(transport="sse", host=host, port=port)
+    mcp.run(transport="http", host=host, port=port, path="/mcp")
 
 
 @app.command()
