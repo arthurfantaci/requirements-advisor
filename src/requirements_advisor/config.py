@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     # Voyage AI
     voyage_api_key: str = ""
     voyage_model: str = "voyage-context-3"  # Contextualized embeddings for better RAG
-    voyage_batch_size: int = 50
+    voyage_batch_size: int = 20  # Reduced for voyage-context-3 token limits
 
     # Vector Store
     vector_store_type: str = "chroma"  # chroma | qdrant

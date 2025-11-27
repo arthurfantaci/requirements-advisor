@@ -15,12 +15,16 @@ from requirements_advisor.config import Settings
 class TestSettings:
     """Test Settings class."""
 
-    def test_default_values(self):
+    def test_default_values(self, monkeypatch):
         """Test that default values are set correctly."""
+        # Clear env vars that might override defaults from .env file
+        monkeypatch.delenv("VOYAGE_MODEL", raising=False)
+        monkeypatch.delenv("VOYAGE_BATCH_SIZE", raising=False)
+
         settings = Settings(voyage_api_key="test-key")
 
-        assert settings.voyage_model == "voyage-3"
-        assert settings.voyage_batch_size == 50
+        assert settings.voyage_model == "voyage-context-3"
+        assert settings.voyage_batch_size == 20
         assert settings.vector_store_type == "chroma"
         assert settings.collection_name == "requirements_guidance"
         assert settings.host == "0.0.0.0"
