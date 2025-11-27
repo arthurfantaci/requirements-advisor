@@ -15,19 +15,22 @@ def create_embedding_provider(
 ) -> EmbeddingProvider:
     """
     Factory function to create an embedding provider.
-    
+
     Args:
         provider_type: Type of provider ("voyage", future: "openai", "cohere")
         api_key: API key for the provider
         model: Optional model override
-        
+
     Returns:
         Configured EmbeddingProvider instance
+
+    Raises:
+        ValueError: If provider_type is not recognized or api_key is empty
     """
     if provider_type == "voyage":
         return VoyageEmbedding(
             api_key=api_key,
-            model=model or "voyage-3",
+            model=model or "voyage-context-3",
         )
     else:
         raise ValueError(f"Unknown embedding provider: {provider_type}")

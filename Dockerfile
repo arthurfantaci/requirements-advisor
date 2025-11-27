@@ -9,9 +9,11 @@ FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS builder
 
 WORKDIR /app
 
-# Install build dependencies
+# Install build dependencies (including libjpeg for Pillow image processing)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    libjpeg-dev \
+    zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency files and source code (needed for package build)
@@ -22,11 +24,11 @@ COPY src/ ./src/
 RUN uv venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Install the package (includes dependencies)
-RUN uv pip install --no-cache .
+# Install the package with ingestion extras (includes Pillow for image processing)
+RUN uv pip install --no-cache ".[ingestion]"
 
 # ============================================
-# Stage 2: Ingestion - Build vector database
+# Stage 2: Ingestion - Build vector database and cache images
 # ============================================
 FROM builder AS ingestion
 
@@ -38,14 +40,15 @@ COPY content/ ./content/
 # Set environment for ingestion
 ENV VECTOR_STORE_TYPE="chroma"
 ENV VECTOR_STORE_PATH="/app/data/chroma"
+ENV IMAGE_CACHE_PATH="/app/data/images"
 ENV CONTENT_DIR="/app/content"
 
 # Build argument for Voyage API key (required for ingestion)
 ARG VOYAGE_API_KEY
 ENV VOYAGE_API_KEY=${VOYAGE_API_KEY}
 
-# Run ingestion to build the vector database
-RUN python -m requirements_advisor.cli ingest --clear
+# Run ingestion to build the vector database and cache images
+RUN python -m requirements_advisor.cli ingest --clear --fetch-images
 
 # ============================================
 # Stage 3: Runtime - Minimal production image
@@ -65,8 +68,9 @@ ENV PATH="/app/.venv/bin:$PATH"
 COPY src/ ./src/
 COPY content/ ./content/
 
-# Copy pre-built vector database from ingestion stage
+# Copy pre-built vector database and image cache from ingestion stage
 COPY --from=ingestion /app/data/chroma /app/data/chroma
+COPY --from=ingestion /app/data/images /app/data/images
 
 # Set ownership
 RUN chown -R appuser:appuser /app
@@ -79,6 +83,7 @@ ENV VOYAGE_API_KEY=""
 ENV VOYAGE_MODEL="voyage-3"
 ENV VECTOR_STORE_TYPE="chroma"
 ENV VECTOR_STORE_PATH="/app/data/chroma"
+ENV IMAGE_CACHE_PATH="/app/data/images"
 ENV CONTENT_DIR="/app/content"
 ENV HOST="0.0.0.0"
 ENV PORT="8000"

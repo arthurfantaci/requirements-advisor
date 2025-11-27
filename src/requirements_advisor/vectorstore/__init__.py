@@ -18,15 +18,19 @@ def create_vector_store(
 ) -> VectorStore:
     """
     Factory function to create a vector store.
-    
+
     Args:
         store_type: Type of store ("chroma", future: "qdrant", "pinecone")
         collection_name: Name of the collection
         persist_dir: Directory for local persistence (ChromaDB)
         **kwargs: Additional provider-specific arguments
-        
+
     Returns:
         Configured VectorStore instance
+
+    Raises:
+        ValueError: If store_type is not recognized
+        NotImplementedError: If store_type is planned but not yet implemented
     """
     if store_type == "chroma":
         return ChromaVectorStore(

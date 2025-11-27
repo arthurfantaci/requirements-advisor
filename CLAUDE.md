@@ -79,7 +79,10 @@ Factory functions `create_embedding_provider()` and `create_vector_store()` inst
 
 Environment variables (via `.env`):
 - `VOYAGE_API_KEY` (required): Voyage AI API key
-- `VOYAGE_MODEL`: Embedding model (default: `voyage-3`)
+- `VOYAGE_MODEL`: Embedding model (default: `voyage-context-3`). Options include:
+  - `voyage-context-3`: Contextualized embeddings (recommended for RAG)
+  - `voyage-3-large`: Best general-purpose quality
+  - `voyage-3.5`, `voyage-3.5-lite`: Latest standard models
 - `VECTOR_STORE_TYPE`: `chroma` (default) or `qdrant`
 - `VECTOR_STORE_PATH`: Local storage path (default: `./data/chroma`)
 - `COLLECTION_NAME`: Vector collection name (default: `requirements_guidance`)
