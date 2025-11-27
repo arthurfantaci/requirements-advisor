@@ -43,9 +43,13 @@ ENV VECTOR_STORE_PATH="/app/data/chroma"
 ENV IMAGE_CACHE_PATH="/app/data/images"
 ENV CONTENT_DIR="/app/content"
 
-# Build argument for Voyage API key (required for ingestion)
+# Build arguments for ingestion
 ARG VOYAGE_API_KEY
+ARG VOYAGE_MODEL="voyage-context-3"
+ARG VOYAGE_BATCH_SIZE="20"
 ENV VOYAGE_API_KEY=${VOYAGE_API_KEY}
+ENV VOYAGE_MODEL=${VOYAGE_MODEL}
+ENV VOYAGE_BATCH_SIZE=${VOYAGE_BATCH_SIZE}
 
 # Run ingestion to build the vector database and cache images
 RUN python -m requirements_advisor.cli ingest --clear --fetch-images
@@ -80,7 +84,7 @@ USER appuser
 
 # Environment variables (can be overridden)
 ENV VOYAGE_API_KEY=""
-ENV VOYAGE_MODEL="voyage-3"
+ENV VOYAGE_MODEL="voyage-context-3"
 ENV VECTOR_STORE_TYPE="chroma"
 ENV VECTOR_STORE_PATH="/app/data/chroma"
 ENV IMAGE_CACHE_PATH="/app/data/images"
