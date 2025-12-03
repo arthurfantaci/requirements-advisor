@@ -219,16 +219,79 @@ For remote deployments, replace `localhost:8000` with your server URL.
 
 ---
 
-## Available Tools
+## MCP Server Specification
 
-Once connected, the MCP server provides these tools:
+### Server Metadata
 
-| Tool | Description |
-|------|-------------|
-| `search_requirements_guidance` | Search for guidance on any requirements topic |
-| `get_definition` | Get definitions of requirements terms and acronyms |
-| `list_available_topics` | See what topics and sources are available |
-| `get_best_practices` | Get best practices for specific topics |
+| Property | Value |
+|----------|-------|
+| **Name** | `requirements-advisor` |
+| **Transport** | Streamable HTTP (`/mcp` endpoint) |
+| **Description** | Expert guidance on requirements management best practices. Provides answers from authoritative sources including Jama Software's Essential Guide to Requirements Management, INCOSE guidelines, and EARS notation. |
+
+### Tools
+
+This server exposes 4 tools. No resources or prompts are provided.
+
+#### `search_requirements_guidance`
+
+Search requirements management best practices and guidance.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | `string` | Yes | - | Natural language question about requirements management |
+| `top_k` | `integer` | No | `5` | Number of results to return (1-10) |
+| `source` | `string` | No | `null` | Filter by source: `"jama_guide"`, `"incose"`, or `"ears"` |
+| `include_images` | `boolean` | No | `true` | Include related images in response |
+
+**Returns:** List of relevant guidance excerpts with source citations and optional images.
+
+**Use for:** Writing requirements, traceability, validation/verification, regulatory compliance, systems engineering, industry-specific practices (medical, automotive, aerospace).
+
+---
+
+#### `get_definition`
+
+Get the definition of a requirements management term or acronym.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `term` | `string` | Yes | - | The term or acronym to define |
+
+**Returns:** Definition with source attribution.
+
+**Use for:** Terms like SRS, EARS, Traceability, V&V, RTM, and other requirements management terminology.
+
+---
+
+#### `list_available_topics`
+
+List the topics and sources available in the knowledge base.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| *(none)* | - | - | - | - |
+
+**Returns:** Summary of available topics, sources, and document count.
+
+**Use for:** Understanding what guidance is available before searching.
+
+---
+
+#### `get_best_practices`
+
+Get best practices for a specific requirements management topic.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `topic` | `string` | Yes | - | The topic to get best practices for |
+| `include_images` | `boolean` | No | `true` | Include related images in response |
+
+**Returns:** Best practices with explanations, source citations, and optional images.
+
+**Use for:** Topics like writing requirements, traceability, validation, change management, regulatory compliance, agile requirements.
+
+---
 
 ### Example Queries
 
