@@ -1,5 +1,4 @@
-"""
-Tests for MCP server and tools.
+"""Tests for MCP server and tools.
 
 Tests the FastMCP server tools: search_requirements_guidance, get_definition,
 list_available_topics, and get_best_practices.
@@ -309,9 +308,3 @@ class TestServerInitialization:
         app = create_app()
         assert app is mcp
 
-    def test_create_sse_app_returns_app(self):
-        """Test create_sse_app returns SSE application."""
-        from requirements_advisor.server import create_sse_app
-
-        sse_app = create_sse_app()
-        assert sse_app is not None

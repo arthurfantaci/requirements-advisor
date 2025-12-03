@@ -1,5 +1,4 @@
-"""
-Abstract base class for vector stores.
+"""Abstract base class for vector stores.
 
 Enables swapping between ChromaDB (local), Qdrant, Pinecone, etc.
 """
@@ -36,12 +35,12 @@ class VectorStore(ABC):
         documents: list[Document],
         embeddings: list[list[float]],
     ) -> None:
-        """
-        Add documents with their embeddings to the store.
+        """Add documents with their embeddings to the store.
 
         Args:
             documents: List of documents to add
             embeddings: Corresponding embedding vectors
+
         """
         pass
 
@@ -52,8 +51,7 @@ class VectorStore(ABC):
         top_k: int = 5,
         filter_metadata: dict | None = None,
     ) -> list[SearchResult]:
-        """
-        Search for similar documents.
+        """Search for similar documents.
 
         Args:
             query_embedding: Query vector
@@ -62,6 +60,7 @@ class VectorStore(ABC):
 
         Returns:
             List of search results ordered by relevance
+
         """
         pass
 

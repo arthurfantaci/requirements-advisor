@@ -1,5 +1,4 @@
-"""
-Pytest fixtures and configuration for requirements-advisor tests.
+"""Pytest fixtures and configuration for requirements-advisor tests.
 
 This module provides shared fixtures for testing the MCP server, embedding providers,
 vector stores, and ingestion pipeline.
@@ -7,8 +6,8 @@ vector stores, and ingestion pipeline.
 
 import asyncio
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -137,9 +136,11 @@ def mock_embedding_provider() -> EmbeddingProvider:
     provider.model_name = "mock-model"
 
     async def mock_embed_texts(texts: list[str]) -> list[list[float]]:
+        """Return mock embeddings for a list of texts."""
         return [[0.1] * 1024 for _ in texts]
 
     async def mock_embed_query(query: str) -> list[float]:
+        """Return a mock embedding for a query."""
         return [0.1] * 1024
 
     provider.embed_texts = AsyncMock(side_effect=mock_embed_texts)
@@ -156,6 +157,7 @@ def mock_vector_store() -> VectorStore:
     async def mock_add_documents(
         documents: list[Document], embeddings: list[list[float]]
     ) -> None:
+        """Mock adding documents to the store (no-op)."""
         pass
 
     async def mock_search(
@@ -163,6 +165,7 @@ def mock_vector_store() -> VectorStore:
         top_k: int = 5,
         filter_metadata: dict | None = None,
     ) -> list[SearchResult]:
+        """Return a mock search result."""
         return [
             SearchResult(
                 document=Document(
@@ -175,12 +178,15 @@ def mock_vector_store() -> VectorStore:
         ]
 
     async def mock_count() -> int:
+        """Return a mock document count."""
         return 10
 
     async def mock_get_metadata_values(field: str) -> list[str]:
+        """Return mock metadata values."""
         return ["jama_guide", "incose", "ears"]
 
     async def mock_delete_collection() -> None:
+        """Mock deleting a collection (no-op)."""
         pass
 
     store.add_documents = AsyncMock(side_effect=mock_add_documents)

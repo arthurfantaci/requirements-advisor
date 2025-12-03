@@ -1,9 +1,10 @@
-"""
-Voyage AI embedding provider implementation.
+"""Voyage AI embedding provider implementation.
 
 Voyage AI offers high-quality embeddings optimized for retrieval,
 particularly good for technical and domain-specific content.
 """
+
+from typing import cast
 
 import voyageai  # type: ignore[import-untyped]
 from loguru import logger  # type: ignore[import-untyped]
@@ -42,8 +43,7 @@ class VoyageEmbedding(EmbeddingProvider):
     """
 
     def __init__(self, api_key: str, model: str = "voyage-context-3"):
-        """
-        Initialize Voyage AI client.
+        """Initialize Voyage AI client.
 
         Args:
             api_key: Voyage AI API key
@@ -52,6 +52,7 @@ class VoyageEmbedding(EmbeddingProvider):
 
         Raises:
             ValueError: If api_key is empty or None
+
         """
         if not api_key:
             raise ValueError("Voyage API key is required")
@@ -71,8 +72,7 @@ class VoyageEmbedding(EmbeddingProvider):
         console.print(f"[green]Initialized Voyage AI: {model} ({model_type})[/]")
 
     async def embed_texts(self, texts: list[str]) -> list[list[float]]:
-        """
-        Embed documents for storage.
+        """Embed documents for storage.
 
         For contextualized models (voyage-context-3), each text is embedded
         with awareness of surrounding context. For standard models, texts
@@ -83,6 +83,7 @@ class VoyageEmbedding(EmbeddingProvider):
 
         Returns:
             List of embedding vectors
+
         """
         if not texts:
             return []
@@ -99,6 +100,11 @@ class VoyageEmbedding(EmbeddingProvider):
                 model=self.model,
                 input_type="document",
             )
+            # ContextualizedEmbeddingsObject stores results differently:
+            # result.results[i].embeddings contains embeddings for document i
+            embeddings = cast(
+                list[list[float]], [r.embeddings[0] for r in result.results]
+            )
         else:
             # Standard embed API
             result = await self.client.embed(
@@ -106,19 +112,20 @@ class VoyageEmbedding(EmbeddingProvider):
                 model=self.model,
                 input_type="document",
             )
+            embeddings = cast(list[list[float]], result.embeddings)
 
-        logger.debug("Generated {} embeddings", len(result.embeddings))
-        return result.embeddings
+        logger.debug("Generated {} embeddings", len(embeddings))
+        return embeddings
 
     async def embed_query(self, query: str) -> list[float]:
-        """
-        Embed query for retrieval.
+        """Embed query for retrieval.
 
         Args:
             query: Query string to embed
 
         Returns:
             Embedding vector for the query
+
         """
         logger.debug("Embedding query: '{}'", query[:50])
 
@@ -129,6 +136,8 @@ class VoyageEmbedding(EmbeddingProvider):
                 model=self.model,
                 input_type="query",
             )
+            # ContextualizedEmbeddingsObject: result.results[0].embeddings[0]
+            return cast(list[float], result.results[0].embeddings[0])
         else:
             # Standard embed API
             result = await self.client.embed(
@@ -136,20 +145,34 @@ class VoyageEmbedding(EmbeddingProvider):
                 model=self.model,
                 input_type="query",
             )
-
-        return result.embeddings[0]
+            return cast(list[float], result.embeddings[0])
 
     @property
     def dimension(self) -> int:
-        """Return the embedding dimension for this model."""
+        """Return the embedding dimension for this model.
+
+        Returns:
+            Number of dimensions in the embedding vector (e.g., 1024 for voyage-3).
+
+        """
         return self._dimension
 
     @property
     def model_name(self) -> str:
-        """Return the model name."""
+        """Return the model name.
+
+        Returns:
+            Model identifier string (e.g., "voyage-context-3").
+
+        """
         return self.model
 
     @property
     def is_contextualized(self) -> bool:
-        """Return whether this model uses contextualized embeddings."""
+        """Return whether this model uses contextualized embeddings.
+
+        Returns:
+            True if model uses contextualized embed API, False for standard API.
+
+        """
         return self._is_contextualized

@@ -1,5 +1,4 @@
-"""
-Content ingestion pipeline.
+"""Content ingestion pipeline.
 
 Loads JSONL content files, creates embeddings, and stores in vector database.
 Optionally fetches and caches images from content.
@@ -32,8 +31,7 @@ async def ingest_jsonl(
     image_cache: ImageCache | None = None,
     batch_size: int = 50,
 ) -> int:
-    """
-    Ingest a JSONL file into the vector store.
+    """Ingest a JSONL file into the vector store.
 
     Each line in the JSONL should have:
     - article_id or term: unique identifier
@@ -51,6 +49,18 @@ async def ingest_jsonl(
 
     Returns:
         Number of documents ingested
+
+    Example:
+        >>> from pathlib import Path
+        >>> count = await ingest_jsonl(
+        ...     jsonl_path=Path("content/jama_guide.jsonl"),
+        ...     source_name="jama_guide",
+        ...     embedding_provider=voyage_provider,
+        ...     vector_store=chroma_store,
+        ...     batch_size=50,
+        ... )
+        >>> print(f"Ingested {count} documents")
+
     """
     if not jsonl_path.exists():
         logger.warning("File not found: {}", jsonl_path)
@@ -222,8 +232,7 @@ async def ingest_all_sources(
     image_cache: ImageCache | None = None,
     batch_size: int = 50,
 ) -> dict[str, int]:
-    """
-    Ingest all JSONL files from the content directory.
+    """Ingest all JSONL files from the content directory.
 
     Expected files:
     - jama_guide.jsonl: Jama Requirements Management Guide
@@ -239,6 +248,7 @@ async def ingest_all_sources(
 
     Returns:
         Dict mapping source name to document count
+
     """
     logger.info("Starting ingestion of all sources from {}", content_dir)
     results = {}

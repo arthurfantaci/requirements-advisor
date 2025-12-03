@@ -1,5 +1,4 @@
-"""
-FastMCP server for requirements management guidance.
+"""FastMCP server for requirements management guidance.
 
 Provides tools for searching and retrieving best practices
 from authoritative sources like Jama Software, INCOSE, and EARS.
@@ -12,7 +11,7 @@ from typing import TYPE_CHECKING
 from fastmcp import FastMCP
 from fastmcp.utilities.types import Image
 from loguru import logger
-from mcp.types import TextContent
+from mcp.types import ImageContent, TextContent
 
 from .config import settings
 from .embeddings import create_embedding_provider
@@ -92,8 +91,7 @@ async def search_requirements_guidance(
     source: str | None = None,
     include_images: bool = True,
 ) -> list:
-    """
-    Search requirements management best practices and guidance.
+    """Search requirements management best practices and guidance.
 
     Use this tool to find expert guidance on topics like:
     - Writing effective requirements
@@ -111,6 +109,7 @@ async def search_requirements_guidance(
 
     Returns:
         Relevant guidance excerpts with source citations, optionally with images
+
     """
     logger.info("Search request: query='{}', top_k={}, source={}", query[:50], top_k, source)
     top_k = max(1, min(10, top_k))  # Clamp to 1-10
@@ -170,7 +169,9 @@ async def search_requirements_guidance(
     text_response = "\n\n---\n\n".join(response_parts)
 
     # Build response content
-    response_content = [TextContent(type="text", text=text_response)]
+    response_content: list[TextContent | ImageContent] = [
+        TextContent(type="text", text=text_response)
+    ]
 
     # Add images if requested and available
     if include_images:
@@ -178,11 +179,10 @@ async def search_requirements_guidance(
         if image_cache:
             cached_images = image_cache.get_images_for_documents(doc_ids)
             for img in cached_images:
-                base64_data = image_cache.load_image_as_base64(img)
-                if base64_data:
-                    response_content.append(
-                        Image(data=base64_data, media_type=img.media_type).to_image_content()
-                    )
+                if img.file_path and not img.fetch_error:
+                    full_path = image_cache.cache_dir / img.file_path
+                    if full_path.exists():
+                        response_content.append(Image(path=full_path).to_image_content())
             logger.debug("Attached {} images to response", len(cached_images))
 
     logger.info("Search completed: {} results returned", len(results))
@@ -191,8 +191,7 @@ async def search_requirements_guidance(
 
 @mcp.tool()
 async def get_definition(term: str) -> str:
-    """
-    Get the definition of a requirements management term or acronym.
+    """Get the definition of a requirements management term or acronym.
 
     Use this for terms like:
     - SRS (System Requirements Specification)
@@ -206,6 +205,7 @@ async def get_definition(term: str) -> str:
 
     Returns:
         Definition with source attribution
+
     """
     logger.info("Definition request: term='{}'", term)
     embedding_provider = get_embedding_provider()
@@ -249,13 +249,13 @@ async def get_definition(term: str) -> str:
 
 @mcp.tool()
 async def list_available_topics() -> str:
-    """
-    List the topics and sources available in the knowledge base.
+    """List the topics and sources available in the knowledge base.
 
     Use this to understand what guidance is available before searching.
 
     Returns:
         Summary of available topics and content sources
+
     """
     logger.info("List topics request")
     vector_store = get_vector_store()
@@ -301,8 +301,7 @@ async def list_available_topics() -> str:
 
 @mcp.tool()
 async def get_best_practices(topic: str, include_images: bool = True) -> list:
-    """
-    Get best practices for a specific requirements management topic.
+    """Get best practices for a specific requirements management topic.
 
     Good topics include:
     - writing requirements
@@ -318,6 +317,7 @@ async def get_best_practices(topic: str, include_images: bool = True) -> list:
 
     Returns:
         Best practices with explanations and source citations
+
     """
     logger.info("Best practices request: topic='{}'", topic)
     embedding_provider = get_embedding_provider()
@@ -354,7 +354,7 @@ async def get_best_practices(topic: str, include_images: bool = True) -> list:
         response += f"{content}\n\n"
 
     # Build response content
-    response_content = [TextContent(type="text", text=response)]
+    response_content: list[TextContent | ImageContent] = [TextContent(type="text", text=response)]
 
     # Add images if requested and available
     if include_images:
@@ -362,11 +362,10 @@ async def get_best_practices(topic: str, include_images: bool = True) -> list:
         if image_cache:
             cached_images = image_cache.get_images_for_documents(doc_ids)
             for img in cached_images:
-                base64_data = image_cache.load_image_as_base64(img)
-                if base64_data:
-                    response_content.append(
-                        Image(data=base64_data, media_type=img.media_type).to_image_content()
-                    )
+                if img.file_path and not img.fetch_error:
+                    full_path = image_cache.cache_dir / img.file_path
+                    if full_path.exists():
+                        response_content.append(Image(path=full_path).to_image_content())
             logger.debug("Attached {} images to best practices response", len(cached_images))
 
     logger.info("Best practices completed: {} results for topic '{}'", len(results), topic)
@@ -383,12 +382,3 @@ def create_app():
 def create_http_app():
     """Create the Streamable HTTP transport app."""
     return mcp.http_app(path="/mcp")
-
-
-# For SSE transport (deprecated)
-def create_sse_app():
-    """Create the SSE transport app.
-
-    Deprecated: Use create_http_app() instead for Streamable HTTP transport.
-    """
-    return mcp.sse_app()

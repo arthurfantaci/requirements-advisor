@@ -1,5 +1,4 @@
-"""
-Vector store package.
+"""Vector store package.
 
 Provides a factory function to create the configured vector store.
 """
@@ -16,8 +15,7 @@ def create_vector_store(
     persist_dir: str | Path = "./data/chroma",
     **kwargs,
 ) -> VectorStore:
-    """
-    Factory function to create a vector store.
+    """Create a vector store instance.
 
     Args:
         store_type: Type of store ("chroma", future: "qdrant", "pinecone")
@@ -31,6 +29,15 @@ def create_vector_store(
     Raises:
         ValueError: If store_type is not recognized
         NotImplementedError: If store_type is planned but not yet implemented
+
+    Example:
+        >>> store = create_vector_store(
+        ...     store_type="chroma",
+        ...     collection_name="my_docs",
+        ...     persist_dir="./data/vectors",
+        ... )
+        >>> count = await store.count()
+
     """
     if store_type == "chroma":
         return ChromaVectorStore(

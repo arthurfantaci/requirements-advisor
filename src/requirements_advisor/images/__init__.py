@@ -1,5 +1,4 @@
-"""
-Image caching package.
+"""Image caching package.
 
 Provides image fetching, processing, and caching for MCP tool responses.
 """

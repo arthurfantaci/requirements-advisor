@@ -1,5 +1,4 @@
-"""
-Configuration management using pydantic-settings.
+"""Configuration management using pydantic-settings.
 
 Loads from environment variables and .env file.
 """
@@ -10,7 +9,29 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment."""
+    """Application settings loaded from environment variables and .env file.
+
+    Attributes:
+        voyage_api_key: Voyage AI API key for generating embeddings.
+        voyage_model: Embedding model name (default: voyage-context-3).
+        voyage_batch_size: Number of texts to embed per API call.
+        vector_store_type: Backend type, either "chroma" or "qdrant".
+        vector_store_path: Local directory for ChromaDB persistence.
+        collection_name: Name of the vector collection.
+        qdrant_url: Qdrant server URL (for remote deployments).
+        qdrant_api_key: Qdrant API key (for authenticated connections).
+        content_dir: Directory containing JSONL content files.
+        image_cache_path: Directory for cached images.
+        image_max_dimension: Maximum image dimension in pixels.
+        image_quality: JPEG compression quality (1-100).
+        image_fetch_timeout: HTTP timeout for image fetching in seconds.
+        host: Server bind address.
+        port: Server bind port.
+        debug: Enable debug mode.
+        log_level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL).
+        log_json: Output logs in JSON format for production.
+
+    """
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -56,6 +77,7 @@ class Settings(BaseSettings):
 
         Returns:
             Path: Resolved path to the content directory.
+
         """
         return Path(self.content_dir)
 
@@ -65,6 +87,7 @@ class Settings(BaseSettings):
 
         Returns:
             Path: Resolved path to the vector store directory.
+
         """
         return Path(self.vector_store_path)
 
@@ -74,6 +97,7 @@ class Settings(BaseSettings):
 
         Returns:
             Path: Resolved path to the image cache directory.
+
         """
         return Path(self.image_cache_path)
 

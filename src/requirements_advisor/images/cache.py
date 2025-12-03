@@ -1,5 +1,4 @@
-"""
-Image caching utilities.
+"""Image caching utilities.
 
 Handles fetching, processing, and caching images from URLs.
 """
@@ -31,14 +30,14 @@ class ImageCache:
         quality: int = 85,
         timeout: int = 30,
     ):
-        """
-        Initialize the image cache.
+        """Initialize the image cache.
 
         Args:
             cache_dir: Directory to store cached images
             max_dimension: Maximum width or height in pixels (preserves aspect ratio)
             quality: JPEG quality (1-100)
             timeout: HTTP request timeout in seconds
+
         """
         self.cache_dir = Path(cache_dir)
         self.max_dimension = max_dimension
@@ -90,8 +89,7 @@ class ImageCache:
         caption: str | None = None,
         context: str | None = None,
     ) -> CachedImage:
-        """
-        Fetch an image from URL, process it, and cache locally.
+        """Fetch an image from URL, process it, and cache locally.
 
         Args:
             url: Image URL to fetch
@@ -104,6 +102,7 @@ class ImageCache:
         Returns:
             CachedImage with metadata and file path. If fetch fails,
             the returned CachedImage will have fetch_error set.
+
         """
         image_id = self._hash_url(url)
         logger.debug("Fetching image: {} (id={})", url[:60], image_id)
@@ -207,8 +206,7 @@ class ImageCache:
         )
 
     def _process_image(self, image_data: bytes, content_type: str) -> tuple[bytes, str, int, int]:
-        """
-        Process an image: resize if needed and optimize.
+        """Process an image: resize if needed and optimize.
 
         Args:
             image_data: Raw image bytes
@@ -220,6 +218,7 @@ class ImageCache:
         Raises:
             PIL.UnidentifiedImageError: If image format is not recognized
             IOError: If image data is corrupted
+
         """
         img = PILImage.open(BytesIO(image_data))
 
@@ -268,14 +267,14 @@ class ImageCache:
         return None
 
     def get_images_for_documents(self, doc_ids: list[str]) -> list[CachedImage]:
-        """
-        Get all cached images for a list of document IDs.
+        """Get all cached images for a list of document IDs.
 
         Args:
             doc_ids: List of document IDs
 
         Returns:
             List of CachedImage objects (excludes failed fetches)
+
         """
         return [
             img
@@ -284,14 +283,14 @@ class ImageCache:
         ]
 
     def load_image_as_base64(self, image: CachedImage) -> str | None:
-        """
-        Load an image file and return as base64 string.
+        """Load an image file and return as base64 string.
 
         Args:
             image: CachedImage with file_path
 
         Returns:
             Base64-encoded image data, or None if file not found
+
         """
         if not image.file_path or image.fetch_error:
             return None

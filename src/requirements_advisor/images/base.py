@@ -1,5 +1,4 @@
-"""
-Data models for image caching.
+"""Data models for image caching.
 
 Provides Pydantic models for cached images and the image index.
 """
@@ -33,17 +32,39 @@ class ImageIndex(BaseModel):
     )
 
     def add_image(self, doc_id: str, image: CachedImage) -> None:
-        """Add an image to the index for a document."""
+        """Add an image to the index for a document.
+
+        Args:
+            doc_id: Document ID to associate the image with.
+            image: CachedImage instance to add to the index.
+
+        """
         if doc_id not in self.images_by_doc:
             self.images_by_doc[doc_id] = []
         self.images_by_doc[doc_id].append(image)
 
     def get_images(self, doc_id: str) -> list[CachedImage]:
-        """Get all images for a document."""
+        """Get all images for a document.
+
+        Args:
+            doc_id: Document ID to retrieve images for.
+
+        Returns:
+            List of CachedImage objects, or empty list if none found.
+
+        """
         return self.images_by_doc.get(doc_id, [])
 
     def get_images_for_docs(self, doc_ids: list[str]) -> list[CachedImage]:
-        """Get all images for multiple documents."""
+        """Get all images for multiple documents.
+
+        Args:
+            doc_ids: List of document IDs to retrieve images for.
+
+        Returns:
+            Combined list of CachedImage objects from all specified documents.
+
+        """
         images = []
         for doc_id in doc_ids:
             images.extend(self.get_images(doc_id))

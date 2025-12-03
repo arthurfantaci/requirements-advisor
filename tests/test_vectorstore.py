@@ -1,5 +1,4 @@
-"""
-Tests for vector store implementations.
+"""Tests for vector store implementations.
 
 Tests ChromaVectorStore implementation and factory function.
 """

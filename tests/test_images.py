@@ -1,13 +1,10 @@
-"""
-Tests for image caching module.
+"""Tests for image caching module.
 
 Tests ImageCache class, image processing, and index management.
 """
 
 import json
 from io import BytesIO
-from pathlib import Path
-from unittest.mock import AsyncMock, patch
 
 import pytest
 import respx

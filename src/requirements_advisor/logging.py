@@ -12,6 +12,7 @@ Example:
     # Then use loguru's logger in any module
     from loguru import logger
     logger.info("Application started")
+
 """
 
 import sys
@@ -47,6 +48,7 @@ def setup_logging(
 
         # Log to file
         setup_logging(level="INFO", log_file="/var/log/requirements-advisor.log")
+
     """
     # Remove default handler
     logger.remove()
@@ -105,6 +107,7 @@ def get_logger(name: str | None = None) -> Any:
     Example:
         logger = get_logger(__name__)
         logger.info("Processing started")
+
     """
     if name:
         return logger.bind(name=name)

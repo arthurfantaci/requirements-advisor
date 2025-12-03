@@ -1,16 +1,13 @@
-"""
-Tests for content ingestion pipeline.
+"""Tests for content ingestion pipeline.
 
 Tests JSONL parsing, document creation, and batch ingestion.
 """
 
 import json
-from pathlib import Path
 
 import pytest
 
 from requirements_advisor.ingestion.pipeline import ingest_all_sources, ingest_jsonl
-from requirements_advisor.vectorstore.base import Document
 
 
 class TestIngestJsonl:

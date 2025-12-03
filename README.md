@@ -1,10 +1,10 @@
 # Requirements Advisor MCP Server
 
-An MCP (Model Context Protocol) server providing expert guidance on requirements management best practices from authoritative sources including Jama Software, INCOSE, and EARS notation.
+An MCP (Model Context Protocol) server providing expert guidance on requirements management best practices from "The Essential Guide to Requirements Management and Traceability" by Jama Softare. A future release will add best practices from the INCOSE Guide and EARS documentation.
 
 ## Features
 
-- **FastMCP Server**: Remote MCP server with SSE transport, compatible with any LLM
+- **FastMCP Server**: Remote MCP server with Streamable HTTP transport, compatible with any LLM
 - **Vector Search**: Semantic search over requirements management guidance
 - **Multi-Source**: Supports multiple authoritative sources (Jama Guide, INCOSE, EARS)
 - **Voyage AI Embeddings**: High-quality embeddings optimized for technical content
@@ -54,7 +54,7 @@ docker compose up -d
 docker compose logs -f mcp-server
 ```
 
-The MCP server is now running at `http://localhost:8000/sse`
+The MCP server is now running at `http://localhost:8000/mcp`
 
 ---
 
@@ -75,7 +75,7 @@ docker compose run --rm ingestion
 # Start server
 docker compose up
 
-# Server available at http://localhost:8000/sse
+# Server available at http://localhost:8000/mcp
 ```
 
 Connect with Claude Desktop or any MCP-compatible client (see "Connecting Clients" below).
@@ -193,7 +193,7 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
 {
   "mcpServers": {
     "requirements-advisor": {
-      "url": "http://localhost:8000/sse"
+      "url": "http://localhost:8000/mcp"
     }
   }
 }
@@ -205,14 +205,14 @@ Restart Claude Desktop to connect.
 
 ```bash
 # Add the MCP server
-claude mcp add requirements-advisor --url http://localhost:8000/sse
+claude mcp add requirements-advisor --url http://localhost:8000/mcp
 ```
 
 ### Other MCP Clients
 
-Any MCP-compatible client can connect via SSE transport at:
+Any MCP-compatible client can connect via Streamable HTTP transport at:
 ```
-http://localhost:8000/sse
+http://localhost:8000/mcp
 ```
 
 For remote deployments, replace `localhost:8000` with your server URL.
@@ -272,6 +272,7 @@ requirements-advisor/
 │   ├── __init__.py
 │   ├── cli.py                  # Typer CLI commands
 │   ├── config.py               # Pydantic settings
+│   ├── logging.py              # Loguru logging configuration
 │   ├── server.py               # FastMCP server + tools
 │   ├── embeddings/
 │   │   ├── base.py             # Abstract interface
@@ -279,12 +280,19 @@ requirements-advisor/
 │   ├── vectorstore/
 │   │   ├── base.py             # Abstract interface
 │   │   └── chroma.py           # ChromaDB implementation
+│   ├── images/
+│   │   ├── base.py             # Image models (CachedImage, ImageIndex)
+│   │   └── cache.py            # Image fetching and caching
 │   └── ingestion/
 │       └── pipeline.py         # Content ingestion
+├── tests/                      # Test suite
+│   ├── conftest.py             # Pytest fixtures
+│   └── test_*.py               # Test modules
 ├── content/                    # JSONL content files
 │   └── requirements_management_guide.jsonl
-└── data/                       # Vector store data (gitignored)
-    └── chroma/
+└── data/                       # Persistent data (gitignored)
+    ├── chroma/                 # Vector store
+    └── images/                 # Cached images
 ```
 
 ---
@@ -296,13 +304,20 @@ All configuration via environment variables (or `.env` file):
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `VOYAGE_API_KEY` | ✅ | - | Voyage AI API key |
-| `VOYAGE_MODEL` | | `voyage-3` | Embedding model |
+| `VOYAGE_MODEL` | | `voyage-context-3` | Embedding model (contextualized) |
+| `VOYAGE_BATCH_SIZE` | | `20` | Texts per embedding API call |
 | `VECTOR_STORE_TYPE` | | `chroma` | Vector store backend |
 | `VECTOR_STORE_PATH` | | `./data/chroma` | Local storage path |
 | `COLLECTION_NAME` | | `requirements_guidance` | Collection name |
 | `CONTENT_DIR` | | `./content` | Content files location |
+| `IMAGE_CACHE_PATH` | | `./data/images` | Image cache directory |
+| `IMAGE_MAX_DIMENSION` | | `1024` | Max image dimension (pixels) |
+| `IMAGE_QUALITY` | | `85` | JPEG compression quality |
+| `IMAGE_FETCH_TIMEOUT` | | `30` | Image fetch timeout (seconds) |
 | `HOST` | | `0.0.0.0` | Server bind host |
 | `PORT` | | `8000` | Server bind port |
+| `LOG_LEVEL` | | `INFO` | Logging level |
+| `LOG_JSON` | | `false` | JSON log output format |
 
 ---
 

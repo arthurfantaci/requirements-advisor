@@ -1,12 +1,9 @@
-"""
-Tests for embedding providers.
+"""Tests for embedding providers.
 
 Tests VoyageEmbedding implementation and factory function.
 """
 
 import pytest
-import respx
-from httpx import Response
 
 from requirements_advisor.embeddings import create_embedding_provider
 from requirements_advisor.embeddings.base import EmbeddingProvider
@@ -63,21 +60,6 @@ class TestVoyageEmbedding:
         assert provider.is_contextualized is False
 
     @pytest.mark.asyncio
-    @respx.mock
-    async def test_embed_texts(self, mock_voyage_response):
-        """Test embedding multiple texts."""
-        respx.post("https://api.voyageai.com/v1/embeddings").mock(
-            return_value=Response(200, json=mock_voyage_response)
-        )
-
-        provider = VoyageEmbedding(api_key="test-key", model="voyage-3")
-        texts = ["Hello world", "Test text"]
-
-        # Note: We're mocking the HTTP response, but the actual embedding
-        # uses the voyageai client which handles the API call
-        # For comprehensive testing, we'd need to mock the client directly
-
-    @pytest.mark.asyncio
     async def test_embed_texts_empty_list(self):
         """Test embedding empty list returns empty list."""
         provider = VoyageEmbedding(api_key="test-key", model="voyage-3")
@@ -109,7 +91,7 @@ class TestEmbeddingFactory:
         """Test default model is voyage-context-3."""
         provider = create_embedding_provider(provider_type="voyage", api_key="test-key")
 
-        assert provider.model == "voyage-context-3"
+        assert provider.model_name == "voyage-context-3"
 
 
 class TestEmbeddingProviderInterface:

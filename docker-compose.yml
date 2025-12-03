@@ -19,20 +19,23 @@ services:
       - "${PORT:-8000}:8000"
     environment:
       - VOYAGE_API_KEY=${VOYAGE_API_KEY}
-      - VOYAGE_MODEL=${VOYAGE_MODEL:-voyage-3}
+      - VOYAGE_MODEL=${VOYAGE_MODEL:-voyage-context-3}
       - VECTOR_STORE_TYPE=chroma
       - VECTOR_STORE_PATH=/app/data/chroma
+      - IMAGE_CACHE_PATH=/app/data/images
       - CONTENT_DIR=/app/content
       - HOST=0.0.0.0
       - PORT=8000
     volumes:
       # Persist vector store data
       - chroma_data:/app/data/chroma
+      # Persist image cache
+      - image_cache:/app/data/images
       # Mount content for reading (read-only)
       - ./content:/app/content:ro
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/sse', timeout=5)"]
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/mcp', timeout=5)"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -48,16 +51,19 @@ services:
     container_name: requirements-advisor-ingestion
     environment:
       - VOYAGE_API_KEY=${VOYAGE_API_KEY}
-      - VOYAGE_MODEL=${VOYAGE_MODEL:-voyage-3}
+      - VOYAGE_MODEL=${VOYAGE_MODEL:-voyage-context-3}
       - VECTOR_STORE_TYPE=chroma
       - VECTOR_STORE_PATH=/app/data/chroma
+      - IMAGE_CACHE_PATH=/app/data/images
       - CONTENT_DIR=/app/content
     volumes:
       # Same volume as server for shared data
       - chroma_data:/app/data/chroma
+      # Same image cache as server
+      - image_cache:/app/data/images
       # Mount content for ingestion
       - ./content:/app/content:ro
-    command: ["python", "-m", "requirements_advisor.cli", "ingest", "--clear"]
+    command: ["python", "-m", "requirements_advisor.cli", "ingest", "--clear", "--fetch-images"]
     profiles:
       - setup  # Only runs when explicitly requested
 
@@ -66,4 +72,6 @@ services:
 # ===========================================
 volumes:
   chroma_data:
+    driver: local
+  image_cache:
     driver: local

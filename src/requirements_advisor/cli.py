@@ -1,5 +1,4 @@
-"""
-CLI for the Requirements Advisor MCP server.
+"""CLI for the Requirements Advisor MCP server.
 
 Commands:
 - serve: Start the MCP server
@@ -30,7 +29,7 @@ console = Console()
 def main(
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable debug logging"),
 ):
-    """Requirements Advisor - MCP server for requirements management guidance."""
+    """Configure logging for the Requirements Advisor CLI."""
     log_level = "DEBUG" if verbose else settings.log_level
     setup_logging(level=log_level, json_output=settings.log_json)
     logger.debug("CLI initialized with log level: {}", log_level)

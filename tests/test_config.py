@@ -1,13 +1,9 @@
-"""
-Tests for configuration module.
+"""Tests for configuration module.
 
 Tests Settings class, environment variable loading, and property methods.
 """
 
-import os
 from pathlib import Path
-
-import pytest
 
 from requirements_advisor.config import Settings
 

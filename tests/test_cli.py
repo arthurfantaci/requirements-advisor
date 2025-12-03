@@ -1,12 +1,10 @@
-"""
-Tests for CLI commands.
+"""Tests for CLI commands.
 
 Tests serve, ingest, info, and test-search commands.
 """
 
 from unittest.mock import MagicMock, patch
 
-import pytest
 from typer.testing import CliRunner
 
 from requirements_advisor.cli import app
@@ -24,9 +22,10 @@ class TestServeCommand:
 
             result = runner.invoke(app, ["serve"])
 
+            assert result.exit_code == 0
             mock_mcp.run.assert_called_once()
             call_kwargs = mock_mcp.run.call_args.kwargs
-            assert call_kwargs["transport"] == "sse"
+            assert call_kwargs["transport"] == "http"
 
     def test_serve_custom_port(self):
         """Test serve command with custom port."""
@@ -35,6 +34,7 @@ class TestServeCommand:
 
             result = runner.invoke(app, ["serve", "--port", "9000"])
 
+            assert result.exit_code == 0
             call_kwargs = mock_mcp.run.call_args.kwargs
             assert call_kwargs["port"] == 9000
 
@@ -45,6 +45,7 @@ class TestServeCommand:
 
             result = runner.invoke(app, ["serve", "--host", "127.0.0.1"])
 
+            assert result.exit_code == 0
             call_kwargs = mock_mcp.run.call_args.kwargs
             assert call_kwargs["host"] == "127.0.0.1"
 

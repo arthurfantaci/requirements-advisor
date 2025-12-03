@@ -1,5 +1,4 @@
-"""
-Embedding providers package.
+"""Embedding providers package.
 
 Provides a factory function to create the configured embedding provider.
 """
@@ -13,8 +12,7 @@ def create_embedding_provider(
     api_key: str = "",
     model: str | None = None,
 ) -> EmbeddingProvider:
-    """
-    Factory function to create an embedding provider.
+    """Create an embedding provider instance.
 
     Args:
         provider_type: Type of provider ("voyage", future: "openai", "cohere")
@@ -26,6 +24,15 @@ def create_embedding_provider(
 
     Raises:
         ValueError: If provider_type is not recognized or api_key is empty
+
+    Example:
+        >>> provider = create_embedding_provider(
+        ...     provider_type="voyage",
+        ...     api_key="your-api-key",
+        ...     model="voyage-context-3",
+        ... )
+        >>> embedding = await provider.embed_query("What is traceability?")
+
     """
     if provider_type == "voyage":
         return VoyageEmbedding(

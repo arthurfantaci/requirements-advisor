@@ -1,6 +1,4 @@
-"""
-Content ingestion package.
-"""
+"""Content ingestion package."""
 
 from .pipeline import ingest_all_sources, ingest_jsonl
 
